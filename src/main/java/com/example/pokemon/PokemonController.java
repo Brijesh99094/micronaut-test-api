@@ -1,8 +1,12 @@
 package com.example.pokemon;
 
+import com.example.Exceptions.EntityAlreadyExistException;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 
 import java.util.List;
+
+
 
 @Controller("/pokemon")
 public class PokemonController {
@@ -13,22 +17,23 @@ public class PokemonController {
     this.pokemonService = pokemonService;
   }
 
+
   @Get
-  public List<Pokemon> test() {
-    return pokemonService.get();
+  public HttpResponse<List<Pokemon>> test() {
+    return HttpResponse.ok(pokemonService.get());
   }
 
   @Post
-  public Pokemon create(@Body Pokemon pokemon) {
-    return pokemonService.addPokemon(pokemon);
+  public HttpResponse<Pokemon> create(@Body PokemonCreationForm pokemonForm) {
+    return HttpResponse.created( pokemonService.addPokemon(pokemonForm));
   }
 
   @Get(value = "/{id}")
   public Pokemon getPokemonById(@QueryValue Integer id) {
-    return pokemonService.getPokemonById(id);
+    return  pokemonService.getPokemonById(id);
   }
 
-  @Put(value = "/{id}")
+  @Put
   public Pokemon updatePokemon(@Body Pokemon pokemon) {
     return pokemonService.updatePokemon(pokemon);
   }

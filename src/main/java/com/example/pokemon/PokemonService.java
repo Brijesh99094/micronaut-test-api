@@ -1,64 +1,66 @@
 package com.example.pokemon;
 
-import com.example.Exceptions.PokemonNotFound;
+import com.example.Exceptions.EntityAlreadyExistException;
+import com.example.Exceptions.EntityNotFoundException;
+import com.example.power.PowerService;
 import jakarta.inject.Singleton;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.Optional;
 
 @Singleton
 public class PokemonService {
 
   private final PokemonRepository pokemonRepository;
+  private final PowerService powerService;
 
-  public PokemonService(PokemonRepository pokemonRepository) {
+  public PokemonService(PokemonRepository pokemonRepository, PowerService powerService) {
     this.pokemonRepository = pokemonRepository;
+    this.powerService = powerService;
   }
 
   public List<Pokemon> get() {
-    return StreamSupport.stream(pokemonRepository.findAll().spliterator(), false)
-        .collect(Collectors.toList());
+    return pokemonRepository.findAll();
   }
 
-  public Pokemon addPokemon(Pokemon pokemon) {
-   if(!isPokemonExistByName(pokemon.getName())){
-     return pokemonRepository.save(pokemon);
-   }
-   else {
-     throw new PokemonNotFound("Pokemon is already exist with this name");
-   }
+
+  public Pokemon addPokemon(PokemonCreationForm pokemonForm) {
+    Optional<Pokemon> fetchedPokemon = pokemonRepository.findByName(pokemonForm.getName());
+    if(fetchedPokemon.isPresent()){
+      throw new EntityAlreadyExistException("Pokemon is Already Exist");
+    }
+    Pokemon pokemon  = new Pokemon();
+    pokemon.setName(pokemonForm.getName());
+    pokemon.setPower(powerService.getById(pokemonForm.getPower()));
+    return   pokemonRepository.save(pokemon);
   }
 
   public Pokemon getPokemonById(Integer id) {
     return pokemonRepository
         .findById(id)
-        .orElseThrow(() -> new PokemonNotFound("Pokemon not found"));
+        .orElseThrow(() -> new EntityNotFoundException("Pokemon not found"));
   }
 
   public Pokemon updatePokemon(Pokemon pokemon) {
-    if (pokemonRepository.findById(pokemon.getId()).isEmpty()) {
-      throw new PokemonNotFound("Pokemon not found in update");
+    Optional<Pokemon> fetchedPokemon = pokemonRepository.findByName(pokemon.getName());
+    if(fetchedPokemon.isPresent()){
+      return pokemonRepository.updateByName(pokemon.getName(),pokemon);
     }
-    return pokemonRepository.update(pokemon);
+    else throw new EntityAlreadyExistException("Pokemon Name is not exist in database");
   }
   //
   public Pokemon deletePokemon(Integer id) {
     Pokemon deletePokemon =
-        pokemonRepository.findById(id).orElseThrow(() -> new PokemonNotFound("Pokemon not found delete"));
+        pokemonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pokemon not found delete"));
     pokemonRepository.deleteById(id);
     return deletePokemon;
   }
 
 
   public  boolean isPokemonExistByName(String name){
-    List<String> pokemonList =  StreamSupport.stream(pokemonRepository.findAll().spliterator(), false)
-            .filter(pokemon -> pokemon.getName().equals(name))
-            .map(pokemon -> pokemon.getName())
-            .collect(Collectors.toList());
-    System.out.println("pokemonList = " + pokemonList);
-    return  pokemonList.isEmpty();
+    Optional<Pokemon> fetchedPokemon= pokemonRepository.findByName(name);
+    if(fetchedPokemon.isPresent()) return true;
+    else throw new EntityNotFoundException("Pokemon Not found");
   }
-  
+
 }
