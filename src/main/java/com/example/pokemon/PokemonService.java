@@ -32,6 +32,7 @@ public class PokemonService {
     Pokemon pokemon  = new Pokemon();
     pokemon.setName(pokemonForm.getName());
     pokemon.setPower(powerService.getById(pokemonForm.getPower()));
+    pokemon.setImgUrl(pokemonForm.getImgUrl());
     return   pokemonRepository.save(pokemon);
   }
 

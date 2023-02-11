@@ -1,28 +1,42 @@
 package com.example.pokemon;
 
-
+import com.example.power.Power;
+import com.example.power.PowerService;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import static org.mockito.ArgumentMatchers.*;
 class PokemonServiceTest {
 
-    @Test
-    public  void testAddPokemon(){
-        Pokemon mockedPokemon = Mockito.mock(Pokemon.class);
-        PokemonCreationForm pokemonCreationForm = Mockito.mock(PokemonCreationForm.class);
+  PokemonService pokemonService;
+  PokemonCreationForm pokemonCreationForm;
+  PokemonService mockedService;
+  PokemonRepository pokemonRepository;
 
-        PokemonService mockedService = Mockito.mock(PokemonService.class);
+  PowerService powerService;
 
-        Mockito.when(mockedService.addPokemon(pokemonCreationForm)).thenReturn(mockedPokemon);
+  @BeforeEach
+  void setUp() {
+    pokemonRepository = Mockito.mock(PokemonRepository.class);
+    powerService = Mockito.mock(PowerService.class);
+    pokemonService = new PokemonService(pokemonRepository, powerService);
+  }
 
-        //when
-        Pokemon pokemon = mockedService.addPokemon(pokemonCreationForm);
+  @Test
+  public void testAddPokemon() {
+    // given
+    pokemonCreationForm = new PokemonCreationForm("sagar", 2, "sagarurl");
 
-        //then
-        Mockito.verify(mockedService).addPokemon(pokemonCreationForm);
+   //when
+    pokemonService.addPokemon(pokemonCreationForm);
+  //then
+    Mockito.verify(pokemonRepository).findByName(pokemonCreationForm.getName());
+    Mockito.verify(powerService).getById(pokemonCreationForm.getPower());
+    Mockito.verify(pokemonRepository).save(any());
+  }
 
-        Assertions.assertThat(pokemon).isEqualTo(mockedPokemon);
-
-    }
+  @Test
+  public void shouldReturnListOfPokemons() {}
 }

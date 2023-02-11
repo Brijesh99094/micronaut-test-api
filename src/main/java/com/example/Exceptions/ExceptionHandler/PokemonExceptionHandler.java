@@ -14,7 +14,6 @@ import jakarta.inject.Singleton;
 @Requires(classes = PokemonException.class)
 public class PokemonExceptionHandler implements ExceptionHandler<PokemonException, HttpResponse<PokemonException>> {
 
-
     @Override
     public HttpResponse<PokemonException> handle(HttpRequest request, PokemonException exception) {
         return HttpResponse.badRequest(exception);

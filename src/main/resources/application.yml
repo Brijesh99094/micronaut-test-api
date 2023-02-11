@@ -7,12 +7,12 @@ micronaut:
 
 datasources:
   default:
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: ${DATASOURCE_DEFAULT_DRIVER:org.mariadb.jdbc.Driver}
     db-type: mariadb
     dialect: MYSQL
-    jdbc-url: jdbc:mariadb://localhost:3306/Pokemon
-    username: example-user
-    password: my_cool_secret
+    jdbc-url: ${DATASOURCE_DEFAULT_URL:`jdbc:mariadb://localhost:3306/Pokemon`}
+    username: ${DATASOURCE_DEFAULT_USER:example-user}
+    password: ${DATASOURCE_DEFAULT_PASSWORD:my_cool_secret}
 
 liquibase:
   datasources:
@@ -22,5 +22,3 @@ netty:
   default:
     allocator:
       max-order: 3
-
-
