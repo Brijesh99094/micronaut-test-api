@@ -11,36 +11,43 @@ import java.util.Optional;
 class PowerServiceTest {
 
   PowerRepository powerRepository;
-  Power expectedPower;
+  Power grass;
   PowerService powerService;
 
   @BeforeEach
   public void setUp() {
     powerRepository = Mockito.mock(PowerRepository.class);
     powerService = new PowerService(powerRepository);
-    expectedPower = new Power(2, "grass");
+    grass = new Power(2, "grass");
   }
 
   @Test
   public void shouldReturnPower() {
-    powerRepository = Mockito.mock(PowerRepository.class);
-    powerService = new PowerService(powerRepository);
-    expectedPower = new Power(2, "grass");
-    // given
-    Mockito.when(powerRepository.findById(2)).thenReturn(Optional.of(expectedPower));
-    // when
-    Power receivedPower = powerService.getById(2);
-    // then
-    Mockito.verify(powerRepository).findById(2);
 
-    Assertions.assertThat(receivedPower).isEqualTo(expectedPower);
+    // given
+    Mockito.when(powerRepository.findById(grass.getId())).thenReturn(Optional.of(grass));
+
+    // when
+    Power receivedPower = powerService.getById(grass.getId());
+
+    // then
+    Mockito.verify(powerRepository).findById(grass.getId());
+    Assertions.assertThat(receivedPower).isEqualTo(grass);
   }
 
   @Test
-  public void shouldThrowExceptionIfPowerIsNotExist() {
-    int powerId = 15;
-    Mockito.when(powerRepository.findById(2)).thenReturn(Optional.ofNullable(expectedPower));
-    Assertions.assertThatThrownBy(() -> powerService.getById(powerId))
-        .isInstanceOf(EntityNotFoundException.class);
+  public void shouldThrowExceptionWhenFetchingPowerWithUnknownId() {
+
+    //given
+    int idOfPowerToBeFetched = 15;
+
+    //when
+    Mockito.when(powerRepository.findById(idOfPowerToBeFetched)).thenReturn(Optional.empty());
+
+    //then
+    Assertions.assertThatThrownBy(() -> powerService.getById(idOfPowerToBeFetched))
+        .isInstanceOf(EntityNotFoundException.class).hasMessage("This power doesn't exist");
+
+    Mockito.verify(powerRepository).findById(idOfPowerToBeFetched);
   }
 }
