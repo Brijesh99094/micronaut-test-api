@@ -47,7 +47,7 @@ public class PokemonService {
     if(fetchedPokemon.isPresent()){
       return pokemonRepository.updateByName(pokemon.getName(),pokemon);
     }
-    else throw new EntityAlreadyExistException("Pokemon Name is not exist in database");
+    else throw new EntityNotFoundException("Pokemon Name is not exist in database");
   }
   //
   public Pokemon deletePokemon(Integer id) {
