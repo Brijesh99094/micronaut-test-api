@@ -16,69 +16,98 @@ import static org.mockito.ArgumentMatchers.any;
 
 class PokemonServiceTest {
 
-  PokemonService pokemonService;
-  PokemonCreationForm pokemonCreationForm;
-  PokemonService mockedService;
-  PokemonRepository pokemonRepository;
-  PowerService powerService;
+    PokemonService pokemonService;
+    PokemonCreationForm pokemonCreationForm;
+    PokemonService mockedService;
+    PokemonRepository pokemonRepository;
+    PowerService powerService;
 
   Pokemon bulbasaur, pikachu;
 
-  @BeforeEach
-  void setUp() {
-    bulbasaur = new Pokemon(1, "bulbasaur", new Power(1, "grass"), "bulbasaur.png");
-    pikachu = new Pokemon(2, "pikachu", new Power(2, "thunder"), "pikachu.png");
-    pokemonRepository = Mockito.mock(PokemonRepository.class);
-    powerService = Mockito.mock(PowerService.class);
-    pokemonService = new PokemonService(pokemonRepository, powerService);
-  }
+    @BeforeEach
+    void setUp() {
+        bulbasaur = new Pokemon(1, "bulbasaur", new Power(1, "grass"), "bulbasaur.png");
+        pikachu = new Pokemon(2, "pikachu", new Power(2, "thunder"), "pikachu.png");
+        pokemonRepository = Mockito.mock(PokemonRepository.class);
+        powerService = Mockito.mock(PowerService.class);
+        pokemonService = new PokemonService(pokemonRepository, powerService);
+    }
+    @Test
+    public void shouldReturnListOfPokemon() {
+        // given
+        Mockito.when(pokemonRepository.findAll()).thenReturn(List.of(bulbasaur, pikachu));
+        // when
+        List<Pokemon> pokemonList = pokemonService.get();
+        // then
+        Mockito.verify(pokemonRepository).findAll();
+        Assertions.assertThat(pokemonList)
+                .containsExactlyInAnyOrderElementsOf(List.of(pikachu, bulbasaur));
+    }
+    @Test
+    public void shouldAddPokemon() {
+        // given
+        pokemonCreationForm = new PokemonCreationForm("sagar", 2, "sagarurl");
+        Power expectedPower = new Power(2, "grass");
+        Pokemon expectedPokemon = new Pokemon(null, "sagar", expectedPower, "sagarUrl");
+        Mockito.when(powerService.getById(pokemonCreationForm.getPower())).thenReturn(expectedPower);
+        Mockito.when(pokemonRepository.save(any(Pokemon.class))).thenReturn(expectedPokemon);
 
-  @Test
-  public void shouldAddPokemon() {
-    // given
-    pokemonCreationForm = new PokemonCreationForm("sagar", 2, "sagarurl");
-    Power expectedPower = new Power(2, "grass");
-    Pokemon expectedPokemon = new Pokemon(null, "sagar", expectedPower, "sagarUrl");
-    Mockito.when(powerService.getById(pokemonCreationForm.getPower())).thenReturn(expectedPower);
-    Mockito.when(pokemonRepository.save(any(Pokemon.class))).thenReturn(expectedPokemon);
+        // when
+        Pokemon recievedPokemon = pokemonService.addPokemon(pokemonCreationForm);
 
-    // when
-    Pokemon recievedPokemon = pokemonService.addPokemon(pokemonCreationForm);
+        // then
+        Mockito.verify(pokemonRepository).findByName(pokemonCreationForm.getName());
+        Mockito.verify(powerService).getById(pokemonCreationForm.getPower());
+        Mockito.verify(pokemonRepository).save(any(Pokemon.class));
 
-    // then
-    Mockito.verify(pokemonRepository).findByName(pokemonCreationForm.getName());
-    Mockito.verify(powerService).getById(pokemonCreationForm.getPower());
-    Mockito.verify(pokemonRepository).save(any(Pokemon.class));
+        Assertions.assertThat(recievedPokemon).isEqualTo(expectedPokemon);
+    }
 
-    Assertions.assertThat(recievedPokemon).isEqualTo(expectedPokemon);
-  }
+    @Test
+    public void shouldThrowExceptionWhenAddPokemon() {
+        // given
+        pokemonCreationForm = new PokemonCreationForm("sagar", 2, "sagarurl");
 
-  @Test
-  public void shouldThrowExceptionWhenAddPokemon() {
-    // given
-    pokemonCreationForm = new PokemonCreationForm("sagar", 2, "sagarurl");
+        // when
+        Mockito.when(pokemonRepository.findByName(pokemonCreationForm.getName()))
+                .thenReturn(Optional.of(new Pokemon()));
 
-    //    when
-    Mockito.when(pokemonRepository.findByName(pokemonCreationForm.getName()))
-        .thenReturn(Optional.of(new Pokemon()));
+        // then
+        Assertions.assertThatThrownBy(() -> pokemonService.addPokemon(pokemonCreationForm))
+                .isInstanceOf(EntityAlreadyExistException.class)
+                .hasMessage("Pokemon is Already Exist");
+    }
 
-    //    then
-    Assertions.assertThatThrownBy(() -> pokemonService.addPokemon(pokemonCreationForm))
-        .isInstanceOf(EntityAlreadyExistException.class)
-        .hasMessage("Pokemon is Already Exist");
-  }
+    @Test
+    public void canGetPokemonById() {
+      // given
+      Mockito.when(pokemonRepository.findById(pikachu.getId()))
+              .thenReturn(Optional.of(pikachu));
 
-  @Test
-  public void shouldReturnListOfPokemon() {
-    // given
-    Mockito.when(pokemonRepository.findAll()).thenReturn(List.of(bulbasaur, pikachu));
-    // when
-    List<Pokemon> pokemonList = pokemonService.get();
-    // then
-    Mockito.verify(pokemonRepository).findAll();
-    Assertions.assertThat(pokemonList)
-        .containsExactlyInAnyOrderElementsOf(List.of(pikachu, bulbasaur));
-  }
+      // when
+      Pokemon pokemonResponse = pokemonService.getPokemonById(pikachu.getId());
+
+      // then
+      Assertions.assertThat(pokemonResponse).isEqualTo(pikachu);
+      Mockito.verify(pokemonRepository).findById(pikachu.getId());
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenGetPokemonWithUnknownId() {
+        // given
+        Integer idOfPokemonToBeFetched = 2;
+
+        // when
+        Mockito.when(pokemonRepository.findById(idOfPokemonToBeFetched))
+                .thenReturn(Optional.empty());
+
+        // then
+        Assertions.assertThatThrownBy(() -> pokemonService
+                        .getPokemonById(idOfPokemonToBeFetched))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Pokemon not found");
+        Mockito.verify(pokemonRepository).findById(idOfPokemonToBeFetched);
+    }
 
   @Test
   public void shouldUpdatePokemon() {
