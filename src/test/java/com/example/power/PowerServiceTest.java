@@ -1,40 +1,46 @@
 package com.example.power;
 
+import com.example.Exceptions.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.testng.annotations.BeforeMethod;
 
 import java.util.Optional;
 
 class PowerServiceTest {
 
-    PowerRepository powerRepository;
+  PowerRepository powerRepository;
+  Power expectedPower;
+  PowerService powerService;
 
-  @BeforeMethod
+  @BeforeEach
   public void setUp() {
-
+    powerRepository = Mockito.mock(PowerRepository.class);
+    powerService = new PowerService(powerRepository);
+    expectedPower = new Power(2, "grass");
   }
 
   @Test
-  public  void shouldReturnPower(){
-      powerRepository = Mockito.mock(PowerRepository.class);
-      PowerService powerService = new PowerService(powerRepository);
-      Power expectedPower = new Power(2,"grass");
-      //given
-      Mockito.when(powerRepository.findById(2)).thenReturn(Optional.of(expectedPower));
+  public void shouldReturnPower() {
+    powerRepository = Mockito.mock(PowerRepository.class);
+    powerService = new PowerService(powerRepository);
+    expectedPower = new Power(2, "grass");
+    // given
+    Mockito.when(powerRepository.findById(2)).thenReturn(Optional.of(expectedPower));
+    // when
+    Power receivedPower = powerService.getById(2);
+    // then
+    Mockito.verify(powerRepository).findById(2);
 
-      //when
-      Power receivedPower =  powerService.getById(2);
-
-      //then
-      Mockito.verify(powerRepository).findById(2);
-
-
-      Assertions.assertThat(receivedPower).isEqualTo(expectedPower);
+    Assertions.assertThat(receivedPower).isEqualTo(expectedPower);
   }
 
-
-
+  @Test
+  public void shouldThrowExceptionIfPowerIsNotExist() {
+    int powerId = 15;
+    Mockito.when(powerRepository.findById(2)).thenReturn(Optional.ofNullable(expectedPower));
+    Assertions.assertThatThrownBy(() -> powerService.getById(powerId))
+        .isInstanceOf(EntityNotFoundException.class);
+  }
 }
