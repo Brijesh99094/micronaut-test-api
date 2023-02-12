@@ -52,7 +52,8 @@ public class PokemonService {
   //
   public Pokemon deletePokemon(Integer id) {
     Pokemon deletePokemon =
-        pokemonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pokemon not found delete"));
+        pokemonRepository.findById(id)
+                .orElseThrow(() ->  new EntityNotFoundException("Pokemon not found delete"));
     pokemonRepository.deleteById(id);
     return deletePokemon;
   }

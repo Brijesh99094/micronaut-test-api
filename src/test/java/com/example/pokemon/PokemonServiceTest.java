@@ -143,5 +143,36 @@ class PokemonServiceTest {
 
     Mockito.verify(pokemonRepository).findByName(unknownPokemon.getName());
 
-  }
+    }
+
+    @Test
+    public void shouldDeletePokemon() {
+        // given
+        Mockito.when(pokemonRepository.findById(bulbasaur.getId()))
+                .thenReturn(Optional.of(bulbasaur));
+
+        // when
+        Pokemon deletedPokemon = pokemonService.deletePokemon(bulbasaur.getId());
+
+        // then
+        Mockito.verify(pokemonRepository).findById(bulbasaur.getId());
+        Mockito.verify(pokemonRepository).deleteById(bulbasaur.getId());
+        Assertions.assertThat(deletedPokemon).isEqualTo(bulbasaur);
+    }
+
+    @Test void shouldThrowExceptionWhenDeletingPokemonWithUnknownId() {
+        // given
+        Integer idOfPokemonToBeDeleted = 5;
+
+        // when
+        Mockito.when(pokemonRepository.findById(idOfPokemonToBeDeleted))
+                .thenReturn(Optional.empty());
+
+        // then
+        Assertions.assertThatThrownBy(() ->
+                        pokemonService.deletePokemon(idOfPokemonToBeDeleted))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Pokemon not found delete");
+        Mockito.verify(pokemonRepository).findById(idOfPokemonToBeDeleted);
+    }
 }
