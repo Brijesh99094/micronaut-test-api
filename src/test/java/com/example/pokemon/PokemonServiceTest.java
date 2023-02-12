@@ -7,10 +7,8 @@ import com.example.power.PowerService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import javax.swing.filechooser.FileView;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,6 +125,37 @@ class PokemonServiceTest {
 //    Mockito.verify(pokemonRepository.updateByName(pokemon.getName(),pokemon));
         Assertions.assertThat(updatedPokemon).isEqualTo(pokemon);
 
+    }
+
+    @Test
+    public void shouldDeletePokemon() {
+        // given
+        Mockito.when(pokemonRepository.findById(bulbasaur.getId()))
+                .thenReturn(Optional.of(bulbasaur));
+
+        // when
+        Pokemon deletedPokemon = pokemonService.deletePokemon(bulbasaur.getId());
+
+        // then
+        Mockito.verify(pokemonRepository).findById(bulbasaur.getId());
+        Mockito.verify(pokemonRepository).deleteById(bulbasaur.getId());
+        Assertions.assertThat(deletedPokemon).isEqualTo(bulbasaur);
+    }
+
+    @Test void shouldThrowExceptionWhenDeletingPokemonWithUnknownId() {
+        // given
+        Integer idOfPokemonToBeDeleted = 5;
+
+        // when
+        Mockito.when(pokemonRepository.findById(idOfPokemonToBeDeleted))
+                .thenReturn(Optional.empty());
+
+        // then
+        Assertions.assertThatThrownBy(() ->
+                        pokemonService.deletePokemon(idOfPokemonToBeDeleted))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Pokemon not found delete");
+        Mockito.verify(pokemonRepository).findById(idOfPokemonToBeDeleted);
     }
 }
 
