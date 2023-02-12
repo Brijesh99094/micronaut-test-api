@@ -6,8 +6,10 @@ import com.example.power.PowerService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import javax.swing.filechooser.FileView;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +23,7 @@ class PokemonServiceTest {
   PokemonRepository pokemonRepository;
   PowerService powerService;
 
-  Pokemon bulbasaur, pikachu;
+  Pokemon bulbasaur, pikachu,pokemon;
 
   @BeforeEach
   void setUp() {
@@ -71,13 +73,36 @@ class PokemonServiceTest {
   public void shouldReturnListOfPokemon() {
     // given
     Mockito.when(pokemonRepository.findAll()).thenReturn(List.of(bulbasaur, pikachu));
-
     // when
     List<Pokemon> pokemonList = pokemonService.get();
-
     // then
     Mockito.verify(pokemonRepository).findAll();
     Assertions.assertThat(pokemonList)
         .containsExactlyInAnyOrderElementsOf(List.of(pikachu, bulbasaur));
   }
+
+  @Test
+  public  void shouldUpdatePokemon(){
+    pokemon = new Pokemon(1, "bulbasaur", new Power(1, "grass"), "bulbasaur.png");
+
+    Mockito.when(pokemonRepository.findByName(pokemon.getName()))
+            .thenReturn(Optional.ofNullable(pokemon));
+
+    Mockito.when(pokemonRepository.updateByName(pokemon.getName(),pokemon))
+              .thenReturn(pokemon);
+
+    Pokemon updatedPokemon = pokemonService.updatePokemon(pokemon);
+
+    Mockito.verify(pokemonRepository).findByName(pokemon.getName());
+
+//    issue
+//    Mockito.verify(pokemonRepository.updateByName(pokemon.getName(),pokemon));
+    Assertions.assertThat(updatedPokemon).isEqualTo(pokemon);
+
+  }
+
+
+
 }
+
+
