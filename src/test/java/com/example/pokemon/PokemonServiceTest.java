@@ -91,6 +91,7 @@ class PokemonServiceTest {
 
       // then
       Assertions.assertThat(pokemonResponse).isEqualTo(pikachu);
+      Mockito.verify(pokemonRepository).findById(pikachu.getId());
     }
 
     @Test
@@ -107,6 +108,7 @@ class PokemonServiceTest {
                         .getPokemonById(idOfPokemonToBeFetched))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Pokemon not found");
+        Mockito.verify(pokemonRepository).findById(idOfPokemonToBeFetched);
     }
 
     @Test
