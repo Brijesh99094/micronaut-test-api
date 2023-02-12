@@ -1,6 +1,7 @@
 package com.example.pokemon;
 
 import com.example.Exceptions.EntityAlreadyExistException;
+import com.example.Exceptions.EntityNotFoundException;
 import com.example.power.Power;
 import com.example.power.PowerService;
 import org.assertj.core.api.Assertions;
@@ -95,5 +96,23 @@ class PokemonServiceTest {
     Mockito.verify(pokemonRepository).findByName(bulbasaur.getName());
     Mockito.verify(pokemonRepository).updateByName(bulbasaur.getName(), bulbasaur);
     Assertions.assertThat(updatedPokemon).isEqualTo(bulbasaur);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenUpdatingPokemonWithUnknownName() {
+    // given
+    Pokemon unknownPokemon = new Pokemon(null, "ramu", new Power(2, "grass"), "ramu.png");
+
+    // when
+    Mockito.when(pokemonRepository.findByName(unknownPokemon.getName()))
+        .thenReturn(Optional.empty());
+
+    // then
+    Assertions.assertThatThrownBy(() -> pokemonService.updatePokemon(unknownPokemon))
+        .isInstanceOf(EntityNotFoundException.class)
+        .hasMessage("Pokemon Name is not exist in database");
+
+    Mockito.verify(pokemonRepository).findByName(unknownPokemon.getName());
+
   }
 }
