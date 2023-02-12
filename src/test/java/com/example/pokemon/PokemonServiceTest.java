@@ -1,15 +1,14 @@
 package com.example.pokemon;
 
 import com.example.Exceptions.EntityAlreadyExistException;
+import com.example.Exceptions.EntityNotFoundException;
 import com.example.power.Power;
 import com.example.power.PowerService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import javax.swing.filechooser.FileView;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +22,7 @@ class PokemonServiceTest {
   PokemonRepository pokemonRepository;
   PowerService powerService;
 
-  Pokemon bulbasaur, pikachu,pokemon;
+  Pokemon bulbasaur, pikachu;
 
   @BeforeEach
   void setUp() {
@@ -59,14 +58,14 @@ class PokemonServiceTest {
     // given
     pokemonCreationForm = new PokemonCreationForm("sagar", 2, "sagarurl");
 
-//    when
+    //    when
     Mockito.when(pokemonRepository.findByName(pokemonCreationForm.getName()))
         .thenReturn(Optional.of(new Pokemon()));
 
-//    then
+    //    then
     Assertions.assertThatThrownBy(() -> pokemonService.addPokemon(pokemonCreationForm))
         .isInstanceOf(EntityAlreadyExistException.class)
-            .hasMessage("Pokemon is Already Exist");
+        .hasMessage("Pokemon is Already Exist");
   }
 
   @Test
@@ -82,27 +81,38 @@ class PokemonServiceTest {
   }
 
   @Test
-  public  void shouldUpdatePokemon(){
-    pokemon = new Pokemon(1, "bulbasaur", new Power(1, "grass"), "bulbasaur.png");
+  public void shouldUpdatePokemon() {
 
-    Mockito.when(pokemonRepository.findByName(pokemon.getName()))
-            .thenReturn(Optional.ofNullable(pokemon));
+    // given
+    Mockito.when(pokemonRepository.findByName(bulbasaur.getName()))
+        .thenReturn(Optional.ofNullable(bulbasaur));
+    Mockito.when(pokemonRepository.updateByName(bulbasaur.getName(), bulbasaur))
+        .thenReturn(bulbasaur);
 
-    Mockito.when(pokemonRepository.updateByName(pokemon.getName(),pokemon))
-              .thenReturn(pokemon);
+    // when
+    Pokemon updatedPokemon = pokemonService.updatePokemon(bulbasaur);
 
-    Pokemon updatedPokemon = pokemonService.updatePokemon(pokemon);
-
-    Mockito.verify(pokemonRepository).findByName(pokemon.getName());
-
-//    issue
-//    Mockito.verify(pokemonRepository.updateByName(pokemon.getName(),pokemon));
-    Assertions.assertThat(updatedPokemon).isEqualTo(pokemon);
-
+    /// then
+    Mockito.verify(pokemonRepository).findByName(bulbasaur.getName());
+    Mockito.verify(pokemonRepository).updateByName(bulbasaur.getName(), bulbasaur);
+    Assertions.assertThat(updatedPokemon).isEqualTo(bulbasaur);
   }
 
+  @Test
+  public void shouldThrowExceptionWhenUpdatingPokemonWithUnknownName() {
+    // given
+    Pokemon unknownPokemon = new Pokemon(null, "ramu", new Power(2, "grass"), "ramu.png");
 
+    // when
+    Mockito.when(pokemonRepository.findByName(unknownPokemon.getName()))
+        .thenReturn(Optional.empty());
 
+    // then
+    Assertions.assertThatThrownBy(() -> pokemonService.updatePokemon(unknownPokemon))
+        .isInstanceOf(EntityNotFoundException.class)
+        .hasMessage("Pokemon Name is not exist in database");
+
+    Mockito.verify(pokemonRepository).findByName(unknownPokemon.getName());
+
+  }
 }
-
-
