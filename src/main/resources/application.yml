@@ -1,9 +1,10 @@
 micronaut:
-  server:
-    cors:
-      enabled: true
   application:
     name: testApi
+  server:
+    port: 5000
+    cors:
+      enabled: true
 
 datasources:
   default:
