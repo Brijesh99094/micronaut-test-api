@@ -3,7 +3,7 @@ name: Micronaut CI/CD Pipeline
 on: [ push ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -21,3 +21,12 @@ jobs:
 
       - name: Run gradle build
         run: ./gradlew build
+
+      - name: Print List of Files
+        run: ls
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-app-jar
+          path: build/libs/*-all.jar
