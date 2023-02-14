@@ -42,8 +42,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: ${{ env.AWS_BEANSTALK_APP_NAME }}
-          environment_name: ${{ env.AWS_BEANSTALK_ENV_NAME }}
+          application_name: ${{ vars.AWS_BEANSTALK_APP_NAME }}
+          environment_name: ${{ vars.AWS_BEANSTALK_ENV_NAME }}
           version_label: ${{ github.sha }}
           region: ap-south-1
           deployment_package: test-Api-0.1-all.jar
