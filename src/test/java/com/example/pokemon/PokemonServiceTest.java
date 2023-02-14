@@ -17,20 +17,29 @@ import static org.mockito.ArgumentMatchers.any;
 class PokemonServiceTest {
 
     PokemonService pokemonService;
-    PokemonCreationForm pokemonCreationForm;
+    PokemonCreationForm sagarCreationForm;
     PokemonService mockedService;
     PokemonRepository pokemonRepository;
     PowerService powerService;
 
-  Pokemon bulbasaur, pikachu;
+
+  Pokemon bulbasaur, pikachu,sagar;
+  Power grass;
 
     @BeforeEach
     void setUp() {
         bulbasaur = new Pokemon(1, "bulbasaur", new Power(1, "grass"), "bulbasaur.png");
         pikachu = new Pokemon(2, "pikachu", new Power(2, "thunder"), "pikachu.png");
+
+        sagarCreationForm = new PokemonCreationForm("sagar", 2, "sagarurl");
+        grass = new Power(2, "grass");
+        sagar = new Pokemon(null, "sagar", grass, "sagarUrl");
+
         pokemonRepository = Mockito.mock(PokemonRepository.class);
         powerService = Mockito.mock(PowerService.class);
         pokemonService = new PokemonService(pokemonRepository, powerService);
+
+
     }
     @Test
     public void shouldReturnListOfPokemon() {
@@ -46,34 +55,32 @@ class PokemonServiceTest {
     @Test
     public void shouldAddPokemon() {
         // given
-        pokemonCreationForm = new PokemonCreationForm("sagar", 2, "sagarurl");
-        Power expectedPower = new Power(2, "grass");
-        Pokemon expectedPokemon = new Pokemon(null, "sagar", expectedPower, "sagarUrl");
-        Mockito.when(powerService.getById(pokemonCreationForm.getPower())).thenReturn(expectedPower);
-        Mockito.when(pokemonRepository.save(any(Pokemon.class))).thenReturn(expectedPokemon);
+
+        Mockito.when(powerService.getById(sagarCreationForm.getPower())).thenReturn(grass);
+        Mockito.when(pokemonRepository.save(any(Pokemon.class))).thenReturn(sagar);
 
         // when
-        Pokemon recievedPokemon = pokemonService.addPokemon(pokemonCreationForm);
+        Pokemon receivedPokemon = pokemonService.addPokemon(sagarCreationForm);
 
         // then
-        Mockito.verify(pokemonRepository).findByName(pokemonCreationForm.getName());
-        Mockito.verify(powerService).getById(pokemonCreationForm.getPower());
+        Mockito.verify(pokemonRepository).findByName(sagarCreationForm.getName());
+        Mockito.verify(powerService).getById(sagarCreationForm.getPower());
         Mockito.verify(pokemonRepository).save(any(Pokemon.class));
 
-        Assertions.assertThat(recievedPokemon).isEqualTo(expectedPokemon);
+        Assertions.assertThat(receivedPokemon).isEqualTo(sagar);
     }
 
     @Test
     public void shouldThrowExceptionWhenAddPokemon() {
         // given
-        pokemonCreationForm = new PokemonCreationForm("sagar", 2, "sagarurl");
+        sagarCreationForm = new PokemonCreationForm("sagar", 2, "sagarurl");
 
         // when
-        Mockito.when(pokemonRepository.findByName(pokemonCreationForm.getName()))
+        Mockito.when(pokemonRepository.findByName(sagarCreationForm.getName()))
                 .thenReturn(Optional.of(new Pokemon()));
 
         // then
-        Assertions.assertThatThrownBy(() -> pokemonService.addPokemon(pokemonCreationForm))
+        Assertions.assertThatThrownBy(() -> pokemonService.addPokemon(sagarCreationForm))
                 .isInstanceOf(EntityAlreadyExistException.class)
                 .hasMessage("Pokemon is Already Exist");
     }
