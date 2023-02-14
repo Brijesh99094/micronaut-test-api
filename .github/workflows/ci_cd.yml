@@ -15,5 +15,9 @@ jobs:
 
       - name: Test and Build Gradle
         uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
+
+      - name: Give gradle executable permission
+        run: chmod +x ./gradlew
+
+      - name: Run gradle build
+        run: ./gradlew build
