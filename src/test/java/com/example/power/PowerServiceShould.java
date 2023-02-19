@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 
 import java.util.Optional;
 
-class PowerServiceTest {
+class PowerServiceShould {
 
   PowerRepository powerRepository;
   Power grass;

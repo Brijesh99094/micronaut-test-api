@@ -14,11 +14,10 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 
-class PokemonServiceTest {
+class PokemonServiceShould {
 
     PokemonService pokemonService;
     PokemonCreationForm pokemonCreationForm;
-    PokemonService mockedService;
     PokemonRepository pokemonRepository;
     PowerService powerService;
 
