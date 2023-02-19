@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-
 @JsonAutoDetect(
         getterVisibility = JsonAutoDetect.Visibility.NONE
 )
 
-public class PokemonException extends  RuntimeException{
+public class PokemonException extends RuntimeException {
 
 
     @JsonProperty

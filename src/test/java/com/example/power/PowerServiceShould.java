@@ -10,44 +10,44 @@ import java.util.Optional;
 
 class PowerServiceShould {
 
-  PowerRepository powerRepository;
-  Power grass;
-  PowerService powerService;
+    PowerRepository powerRepository;
+    Power grass;
+    PowerService powerService;
 
-  @BeforeEach
-  public void setUp() {
-    powerRepository = Mockito.mock(PowerRepository.class);
-    powerService = new PowerService(powerRepository);
-    grass = new Power(2, "grass");
-  }
+    @BeforeEach
+    public void setUp() {
+        powerRepository = Mockito.mock(PowerRepository.class);
+        powerService = new PowerService(powerRepository);
+        grass = new Power(2, "grass");
+    }
 
-  @Test
-  public void shouldReturnPower() {
+    @Test
+    public void shouldReturnPower() {
 
-    // given
-    Mockito.when(powerRepository.findById(grass.getId())).thenReturn(Optional.of(grass));
+        // given
+        Mockito.when(powerRepository.findById(grass.getId())).thenReturn(Optional.of(grass));
 
-    // when
-    Power receivedPower = powerService.getById(grass.getId());
+        // when
+        Power receivedPower = powerService.getById(grass.getId());
 
-    // then
-    Mockito.verify(powerRepository).findById(grass.getId());
-    Assertions.assertThat(receivedPower).isEqualTo(grass);
-  }
+        // then
+        Mockito.verify(powerRepository).findById(grass.getId());
+        Assertions.assertThat(receivedPower).isEqualTo(grass);
+    }
 
-  @Test
-  public void shouldThrowExceptionWhenFetchingPowerWithUnknownId() {
+    @Test
+    public void shouldThrowExceptionWhenFetchingPowerWithUnknownId() {
 
-    //given
-    int idOfPowerToBeFetched = 15;
+        //given
+        int idOfPowerToBeFetched = 15;
 
-    //when
-    Mockito.when(powerRepository.findById(idOfPowerToBeFetched)).thenReturn(Optional.empty());
+        //when
+        Mockito.when(powerRepository.findById(idOfPowerToBeFetched)).thenReturn(Optional.empty());
 
-    //then
-    Assertions.assertThatThrownBy(() -> powerService.getById(idOfPowerToBeFetched))
-        .isInstanceOf(EntityNotFoundException.class).hasMessage("This power doesn't exist");
+        //then
+        Assertions.assertThatThrownBy(() -> powerService.getById(idOfPowerToBeFetched))
+                .isInstanceOf(EntityNotFoundException.class).hasMessage("This power doesn't exist");
 
-    Mockito.verify(powerRepository).findById(idOfPowerToBeFetched);
-  }
+        Mockito.verify(powerRepository).findById(idOfPowerToBeFetched);
+    }
 }

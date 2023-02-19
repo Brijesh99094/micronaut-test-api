@@ -12,7 +12,7 @@ public class PowerService {
         this.powerRepository = powerRepository;
     }
 
-    public Power getById(Integer id){
-        return powerRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("This power doesn't exist"));
+    public Power getById(Integer id) {
+        return powerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("This power doesn't exist"));
     }
 }

@@ -4,6 +4,6 @@ import io.micronaut.data.annotation.Repository;
 import io.micronaut.data.repository.CrudRepository;
 
 @Repository
-public interface PowerRepository extends CrudRepository<Power,Integer> {
+public interface PowerRepository extends CrudRepository<Power, Integer> {
 
 }
