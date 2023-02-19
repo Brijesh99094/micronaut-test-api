@@ -1,5 +1,5 @@
 --liquibase formatted sql
---changeset brijesh:pokemon-table
+--changeset Jaypal:pokemon-table
 
 CREATE TABLE pokemon (
 	name varchar(100) NOT NULL,
@@ -13,7 +13,7 @@ ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
 
---changeset brijesh:power-table
+--changeset Jaypal:power-table
 CREATE TABLE power (
 	id INT auto_increment NOT NULL,
 	name varchar(100) NOT NULL,
@@ -24,12 +24,12 @@ ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
 
---changeset brijesh:removed-column
+--changeset Jaypal:removed-column
 ALTER TABLE pokemon DROP COLUMN power;
---changeset brijesh:added-power
+--changeset Jaypal:added-power
 ALTER TABLE pokemon ADD power_id INT NULL;
 
---changeset brijesh:added-foregin-key
+--changeset Jaypal:added-foregin-key
 ALTER TABLE pokemon ADD CONSTRAINT pokemon_FK FOREIGN KEY (power_id) REFERENCES power(id);
 
 

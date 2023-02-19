@@ -3,15 +3,13 @@ micronaut:
     name: testApi
   server:
     port: 5000
-    cors:
-      enabled: true
 
 datasources:
   default:
     driver-class-name: ${DATASOURCE_DEFAULT_DRIVER:org.mariadb.jdbc.Driver}
     db-type: mariadb
     dialect: MYSQL
-    jdbc-url: ${DATASOURCE_DEFAULT_URL:`jdbc:mariadb://localhost:3810/pokemon`}
+    jdbc-url: ${DATASOURCE_DEFAULT_URL:`jdbc:mariadb://localhost:3809/pokemon`}
     username: ${DATASOURCE_DEFAULT_USER:example-user}
     password: ${DATASOURCE_DEFAULT_PASSWORD:my_cool_secret}
 

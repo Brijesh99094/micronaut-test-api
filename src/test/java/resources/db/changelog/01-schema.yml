@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file : pokemon.sql
+      relativeToChangeLogFile: true
